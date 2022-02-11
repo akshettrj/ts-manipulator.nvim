@@ -3,11 +3,10 @@ local tsm_utils = require('ts-manipulator.utils')
 
 local A = {}
 
-local argument_node_types = {
-    python = {"argument_list"},
-    lua = {"arguments"},
-    cpp = {"parameter_list"},
-    c = {"parameter_list"}
+local valid_node_types = {
+    "argument_list",        -- Python
+    "arguments",            -- Lua
+    "parameter_list",       -- C/C++
 }
 
 local function table_has_val(tab, val)
@@ -22,24 +21,23 @@ end
 -- To get the current argument's node table
 A.get_current = function()
 
-    local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-    local buf_arg_nodetypes = argument_node_types[buf_ft]
-    if buf_arg_nodetypes == nil then
-        error("Filetype '" .. buf_ft .. "' not currently supported")
-    end
-
     local node = tsm_utils.get_node()
     local root_node = ts_utils.get_root_for_node(node)
+
     while (true) do
         local parent = node:parent()
+
         if (parent:id() == root_node:id()) then
             error("The cursor is not above on any argument")
-        elseif table_has_val(buf_arg_nodetypes, parent:type()) then
+
+        elseif table_has_val(valid_node_types, parent:type()) then
             break
-        else
-            node = parent
+
+        else node = parent
+
         end
     end
+
     return node
 end
 
