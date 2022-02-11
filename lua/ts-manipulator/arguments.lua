@@ -4,9 +4,10 @@ local tsm_utils = require('ts-manipulator.utils')
 local A = {}
 
 local valid_node_types = {
-    "argument_list",        -- Python
-    "arguments",            -- Lua
-    "parameter_list",       -- C/C++
+    "argument_list",
+    "arguments",
+    "parameter_list",
+    "parameters",
 }
 
 local function table_has_val(tab, val)
@@ -24,10 +25,10 @@ A.get_current = function()
     local node = tsm_utils.get_node()
     local root_node = ts_utils.get_root_for_node(node)
 
-    while (true) do
+    while true do
         local parent = node:parent()
 
-        if (parent:id() == root_node:id()) then
+        if parent:id() == root_node:id() then
             error("The cursor is not above on any argument")
 
         elseif table_has_val(valid_node_types, parent:type()) then
